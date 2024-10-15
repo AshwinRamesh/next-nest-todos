@@ -28,7 +28,7 @@ export class UserRepository {
     const existingUserCount = await this.em.count(User, {
       username: username,
     });
-    if (existingUserCount) {
+    if (existingUserCount > 0) {
       return true;
     }
     return false;

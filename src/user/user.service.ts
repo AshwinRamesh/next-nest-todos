@@ -30,7 +30,8 @@ export class UserService {
   // TODO - how can we do all of this within one transaction?
   async createUser(data: CreateUserDTO): Promise<UserDTO> {
     // Check username doesn't exist
-    if ((await this.repository.checkUsernameExists(data.username)) === false) {
+    const userExists = await this.repository.checkUsernameExists(data.username);
+    if (userExists === true) {
       throw Error(`Username ${data.username} already exists.`);
     }
 

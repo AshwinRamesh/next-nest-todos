@@ -15,6 +15,7 @@ if (process.env.NODE_ENV === 'prod') {
     password: 'mypassword',
     user: 'myuser',
     port: 5432,
+    allowGlobalContext: true,
   };
 } else {
   console.log('Running in an dev environment');
