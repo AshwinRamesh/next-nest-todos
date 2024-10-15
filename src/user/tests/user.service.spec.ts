@@ -50,4 +50,24 @@ describe('UserService', () => {
       'Username user01 already exists.',
     );
   });
+
+  it('check password', async () => {
+    const createUserDTO = {
+      username: 'user03',
+      name: 'User Three',
+      rawPassword: 'password01',
+    };
+    const user = await service.createUser(createUserDTO);
+    const validPassword = await service.checkPassword({
+      username: createUserDTO.username,
+      password: createUserDTO.rawPassword,
+    });
+    expect(validPassword).toEqual(true);
+
+    const invalidPassword = await service.checkPassword({
+      username: createUserDTO.username,
+      password: 'badpassword',
+    });
+    expect(invalidPassword).toEqual(false);
+  });
 });

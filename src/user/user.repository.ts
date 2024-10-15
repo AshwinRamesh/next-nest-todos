@@ -34,7 +34,9 @@ export class UserRepository {
     return false;
   }
 
-  async getUserDetails() {}
-
-  async checkPassword() {}
+  async getUserDetails(username: string): Promise<User> {
+    return await this.em.findOne(User, {
+      username: username,
+    });
+  }
 }
