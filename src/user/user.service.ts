@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { PasswordCheckerService } from './password-checker.service';
 
@@ -6,6 +10,11 @@ export class CreateUserDTO {
   readonly username: string;
   readonly rawPassword: string;
   readonly name: string;
+}
+
+export class CheckPasswordDTO {
+  username: string;
+  password: string;
 }
 
 export class UserDTO {
@@ -18,11 +27,6 @@ export class UserDTO {
     this.username = username;
     this.name = name;
   }
-}
-
-export class UserLoginDTO {
-  username: string;
-  password: string;
 }
 
 @Injectable()
@@ -56,7 +60,7 @@ export class UserService {
     return new UserDTO(user.id, user.username, user.name);
   }
 
-  async checkPassword(data: UserLoginDTO): Promise<boolean> {
+  async checkPassword(data: CheckPasswordDTO): Promise<boolean> {
     console.log(data);
     const user = await this.repository.getUserDetails(data.username);
     if (!user) {
@@ -70,5 +74,10 @@ export class UserService {
       return false;
     }
     return true;
+  }
+
+  // Will return null if user does not exist.
+  async getUser(username: string): Promise<UserDTO | null> {
+    return this.repository.getUserDetails(username);
   }
 }
