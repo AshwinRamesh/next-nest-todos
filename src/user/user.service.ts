@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -41,7 +42,9 @@ export class UserService {
     // Check username doesn't exist
     const userExists = await this.repository.checkUsernameExists(data.username);
     if (userExists === true) {
-      throw Error(`Username ${data.username} already exists.`);
+      throw new BadRequestException(
+        `Username ${data.username} already exists.`,
+      );
     }
 
     // Hash password

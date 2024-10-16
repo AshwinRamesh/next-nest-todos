@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
+import { PasswordCheckerService } from './password-checker.service';
 
 @Module({
-  providers: [UserService, UserRepository],
+  providers: [UserService, UserRepository, PasswordCheckerService],
   controllers: [UserController],
   exports: [UserService],
 })
