@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class PasswordCheckerService {
+export class PasswordChecker {
   constructor() {}
 
   // Returns a hashed password

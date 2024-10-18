@@ -1,44 +1,20 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { PasswordCheckerService } from './password-checker.service';
-
-export class CreateUserDTO {
-  readonly username: string;
-  readonly rawPassword: string;
-  readonly name: string;
-}
-
-export class CheckPasswordDTO {
-  username: string;
-  password: string;
-}
-
-export class UserDTO {
-  readonly id: number;
-  readonly username: string;
-  readonly name: string;
-
-  constructor(id: number, username: string, name: string) {
-    this.id = id;
-    this.username = username;
-    this.name = name;
-  }
-}
+import { PasswordChecker } from './PasswordChecker';
+import { UserContext } from '../auth/dto/UserContext';
+import { CreateUserDTO } from './dto/CreateUserRequest';
+import { UserDTO } from './dto/UserDTO';
+import { CheckPasswordDTO } from './dto/CheckPasswordRequest';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly repository: UserRepository,
-    private readonly passwordChecker: PasswordCheckerService,
+    private readonly passwordChecker: PasswordChecker,
   ) {}
 
   // TODO - how can we do all of this within one transaction?
-  async createUser(data: CreateUserDTO): Promise<UserDTO> {
+  async createUser(ctx: UserContext, data: CreateUserDTO): Promise<UserDTO> {
     // Check username doesn't exist
     const userExists = await this.repository.checkUsernameExists(data.username);
     if (userExists === true) {
@@ -63,7 +39,10 @@ export class UserService {
     return new UserDTO(user.id, user.username, user.name);
   }
 
-  async checkPassword(data: CheckPasswordDTO): Promise<boolean> {
+  async checkPassword(
+    ctx: UserContext,
+    data: CheckPasswordDTO,
+  ): Promise<boolean> {
     console.log(data);
     const user = await this.repository.getUserDetails(data.username);
     if (!user) {
@@ -73,14 +52,11 @@ export class UserService {
       data.password,
       user.hashed_password,
     );
-    if (!passwordMatches) {
-      return false;
-    }
-    return true;
+    return passwordMatches;
   }
 
   // Will return null if user does not exist.
-  async getUser(username: string): Promise<UserDTO | null> {
+  async getUser(ctx: UserContext, username: string): Promise<UserDTO | null> {
     return this.repository.getUserDetails(username);
   }
 }

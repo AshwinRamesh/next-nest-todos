@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PasswordCheckerService } from '../password-checker.service';
+import { PasswordChecker } from '../PasswordChecker';
 
 describe('PasswordCheckerService', () => {
-  let checker: PasswordCheckerService;
+  let checker: PasswordChecker;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [],
     }).compile();
 
-    checker = new PasswordCheckerService();
+    checker = new PasswordChecker();
   });
 
   it('checker exists', () => {

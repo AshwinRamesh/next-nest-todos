@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../user.service';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { UserRepository } from '../user.repository';
-import { PasswordCheckerService } from '../password-checker.service';
+import { PasswordChecker } from '../PasswordChecker';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import * as process from 'node:process';
 
@@ -14,11 +14,12 @@ describe('UserService', () => {
     console.log('ENV IS: ', process.env.NODE_ENV);
     const module: TestingModule = await Test.createTestingModule({
       imports: [MikroOrmModule.forRoot()],
-      providers: [UserService, UserRepository, PasswordCheckerService],
+      providers: [UserService, UserRepository, PasswordChecker],
     }).compile();
 
     service = module.get<UserService>(UserService);
     orm = module.get(MikroORM);
+    // Clear DB
     await orm.getSchemaGenerator().refreshDatabase();
   });
 

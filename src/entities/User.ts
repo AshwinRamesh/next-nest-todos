@@ -1,7 +1,7 @@
 import { BaseEntity } from './BaseEntity';
 import { Entity, Property, Unique } from '@mikro-orm/core';
 
-@Entity()
+@Entity({ tableName: 'todo_user' })
 export class User extends BaseEntity {
   @Property()
   @Unique()

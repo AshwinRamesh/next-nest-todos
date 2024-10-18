@@ -1,8 +1,16 @@
-import { Body, Controller, Post, Req, UseGuards, Request, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Get,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDTO } from '../user/user.service';
 import { LocalGuard } from './guard/LocalGuard';
 import { LoggedInGuard } from './guard/LoggedInGuard';
+import { UNKNOWN_USER, UserContext } from './dto/UserContext';
+import { CreateUserDTO } from '../user/dto/CreateUserRequest';
 
 @Controller('auth')
 export class AuthController {
@@ -11,7 +19,7 @@ export class AuthController {
   // TODO - move to user module?
   @Post('register')
   registerUser(@Body() user: CreateUserDTO) {
-    return this.authService.registerUser(user);
+    return this.authService.registerUser(UNKNOWN_USER, user);
   }
 
   @UseGuards(LocalGuard)
@@ -28,8 +36,8 @@ export class AuthController {
 
   @UseGuards(LoggedInGuard)
   @Get('/user')
-  getUser(@Request() req): any {
-    const user = req.user;
+  getUser(@Request() req): UserContext {
+    const user: UserContext = req.user;
     return user;
   }
 }

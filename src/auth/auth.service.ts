@@ -1,6 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDTO, UserService } from '../user/user.service';
+import {UserService } from '../user/user.service';
+import { UserContext } from './dto/UserContext';
+import { CreateUserDTO } from '../user/dto/CreateUserRequest';
 
 export class SignInDTO {
   username: string;
@@ -21,21 +23,27 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(data: SignInDTO): Promise<SignInResponseDTO> {
-    const checkPassword = await this.userService.checkPassword(data);
+  async validateUser(
+    ctx: UserContext,
+    data: SignInDTO,
+  ): Promise<SignInResponseDTO> {
+    const checkPassword = await this.userService.checkPassword(ctx, data);
     if (!checkPassword) {
       throw new UnauthorizedException();
     }
-    const user = await this.userService.getUser(data.username);
+    const user = await this.userService.getUser(ctx, data.username);
     return { name: user.name, username: user.username, id: user.id };
   }
 
-  async registerUser(data: CreateUserDTO) {
-    return this.userService.createUser(data);
+  async registerUser(ctx: UserContext, data: CreateUserDTO) {
+    return this.userService.createUser(ctx, data);
   }
 
-  async signInWithJWT(data: SignInDTO): Promise<SignInResponseDTO> {
-    const payload = this.validateUser(data);
+  async signInWithJWT(
+    ctx: UserContext,
+    data: SignInDTO,
+  ): Promise<SignInResponseDTO> {
+    const payload = this.validateUser(ctx, data);
     return {
       ...payload,
       access_token: await this.jwtService.signAsync(payload),
