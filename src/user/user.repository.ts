@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/core';
+import { EnsureRequestContext, EntityManager } from '@mikro-orm/core';
 import { User } from '../entities/User';
 
 export class CreateUserRequest {
@@ -34,6 +34,7 @@ export class UserRepository {
     return false;
   }
 
+  @EnsureRequestContext()
   async getUser(username: string): Promise<User> {
     return await this.em.findOne(User, {
       username: username,

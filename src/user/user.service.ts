@@ -6,6 +6,7 @@ import { CreateUserDTO } from './dto/CreateUserRequest';
 import { UserDTO } from './dto/UserDTO';
 import { CheckPasswordDTO } from './dto/CheckPasswordRequest';
 import { UpdateUserRequest } from './dto/UpdateUserRequest';
+import { EnsureRequestContext } from '@mikro-orm/core';
 
 @Injectable()
 export class UserService {
@@ -57,8 +58,9 @@ export class UserService {
   }
 
   // Will return null if user does not exist.
+
   async getUser(ctx: UserContext, username: string): Promise<UserDTO | null> {
-    return this.repository.getUser(username);
+    return UserDTO.fromUser(await this.repository.getUser(username));
   }
 
   async updateUser(ctx: UserContext, data: UpdateUserRequest) {

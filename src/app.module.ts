@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { RedisModule } from './redis/redis.module';
 import { ExperimentsModule } from './experiments/experiments.module';
+import { TodolistModule } from './todolist/todolist.module';
+import { SharingModule } from './sharing/sharing.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { ExperimentsModule } from './experiments/experiments.module';
     MikroOrmModule.forRoot(),
     RedisModule,
     ExperimentsModule,
+    TodolistModule,
+    SharingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
