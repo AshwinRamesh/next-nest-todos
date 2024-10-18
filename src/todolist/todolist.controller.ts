@@ -26,6 +26,8 @@ export class TodolistController {
 
   @Post(':id/share')
   async shareTodolist() {}
+  @Post(':id/unshare')
+  async unshareTodolist() {}
 
   @Get(':id/item/:itemId')
   async getTodolistItem() {}
