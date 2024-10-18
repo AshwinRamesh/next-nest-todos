@@ -5,6 +5,7 @@ import { UserContext } from '../auth/dto/UserContext';
 import { CreateUserDTO } from './dto/CreateUserRequest';
 import { UserDTO } from './dto/UserDTO';
 import { CheckPasswordDTO } from './dto/CheckPasswordRequest';
+import { UpdateUserRequest } from './dto/UpdateUserRequest';
 
 @Injectable()
 export class UserService {
@@ -44,7 +45,7 @@ export class UserService {
     data: CheckPasswordDTO,
   ): Promise<boolean> {
     console.log(data);
-    const user = await this.repository.getUserDetails(data.username);
+    const user = await this.repository.getUser(data.username);
     if (!user) {
       return false;
     }
@@ -57,6 +58,14 @@ export class UserService {
 
   // Will return null if user does not exist.
   async getUser(ctx: UserContext, username: string): Promise<UserDTO | null> {
-    return this.repository.getUserDetails(username);
+    return this.repository.getUser(username);
+  }
+
+  async updateUser(ctx: UserContext, data: UpdateUserRequest) {
+    const user = this.repository.updateUser(data.username, data.name);
+    if (user) {
+      return user;
+    }
+    throw new BadRequestException('Could not update user.');
   }
 }

@@ -1,3 +1,5 @@
+import { User } from '../../entities/User';
+
 export class UserDTO {
   readonly id: number;
   readonly username: string;
@@ -7,5 +9,9 @@ export class UserDTO {
     this.id = id;
     this.username = username;
     this.name = name;
+  }
+
+  static fromUser(user: User) {
+    return new UserDTO(user.id, user.username, user.name);
   }
 }

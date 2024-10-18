@@ -34,9 +34,22 @@ export class UserRepository {
     return false;
   }
 
-  async getUserDetails(username: string): Promise<User> {
+  async getUser(username: string): Promise<User> {
     return await this.em.findOne(User, {
       username: username,
     });
+  }
+
+  // Will return null if user does not exist
+  async updateUser(username: string, name: string): Promise<User | null> {
+    const user = await this.getUser(username);
+    if (!user) {
+      return null;
+    }
+
+    // Update name and flush.
+    user.name = name;
+    await this.em.persist(user).flush();
+    return user;
   }
 }
