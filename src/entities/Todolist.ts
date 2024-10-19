@@ -21,13 +21,17 @@ export class Todolist extends BaseEntity {
   isCompleted: boolean;
 
   @OneToMany(() => TodolistItem, (item) => item.todolist)
-  books1 = new Collection<TodolistItem>(this);
+  items = new Collection<TodolistItem>(this);
 
   @ManyToOne({ entity: () => User })
   creator: User;
 
-  constructor(name: string) {
+  constructor(name: string, creator: User, details?: string) {
     super();
     this.name = name;
+    this.creator = creator;
+    if (details) {
+      this.details = details;
+    }
   }
 }

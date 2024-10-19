@@ -2,9 +2,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { SharedList } from '../entities/SharedList';
 import { Todolist } from '../entities/Todolist';
 import { User } from '../entities/User';
-
-// TODO - pull out into utils?
-class DbError extends Error {}
+import { DbError } from '../common/DbUtils';
 
 export class SharingRepository {
   constructor(private readonly em: EntityManager) {}

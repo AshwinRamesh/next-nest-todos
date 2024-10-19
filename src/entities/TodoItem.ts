@@ -19,4 +19,10 @@ export class TodolistItem extends BaseEntity {
 
   @ManyToOne({ entity: () => User })
   creator!: User;
+
+  constructor(name: string, creator: User) {
+    super();
+    this.name = name;
+    this.creator = creator;
+  }
 }
