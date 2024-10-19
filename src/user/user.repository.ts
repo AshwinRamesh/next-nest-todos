@@ -35,7 +35,7 @@ export class UserRepository {
   }
 
   @EnsureRequestContext()
-  async getUser(username: string): Promise<User> {
+  async getUser(username: string): Promise<User | null> {
     return await this.em.findOne(User, {
       username: username,
     });
@@ -52,5 +52,9 @@ export class UserRepository {
     user.name = name;
     await this.em.persist(user).flush();
     return user;
+  }
+
+  async getUserById(userId: number) {
+    return await this.em.findOne(User, userId);
   }
 }

@@ -5,7 +5,9 @@ import { UserRepository } from '../user.repository';
 import { PasswordChecker } from '../PasswordChecker';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import * as process from 'node:process';
+import { UNKNOWN_USER } from '../../auth/dto/UserContext';
 
+// TODO - need to fix tests with UNKNOWN_USER ctx.
 describe('UserService', () => {
   let service: UserService;
   let orm: MikroORM;
@@ -33,12 +35,12 @@ describe('UserService', () => {
       name: 'User One',
       rawPassword: 'password01',
     };
-    const user = await service.createUser(createUserDTO);
+    const user = await service.createUser(UNKNOWN_USER, createUserDTO);
     expect(user.name).toEqual('User One');
     expect(user.username).toEqual('user01');
 
     // Create a second user with different username
-    const user2 = await service.createUser({
+    const user2 = await service.createUser(UNKNOWN_USER, {
       username: 'user02',
       name: 'User 2',
       rawPassword: 'diffpass',
@@ -47,9 +49,9 @@ describe('UserService', () => {
     expect(user2.username).toEqual('user02');
 
     // Try create a third user with same username as user01
-    await expect(service.createUser(createUserDTO)).rejects.toThrow(
-      'Username user01 already exists.',
-    );
+    await expect(
+      service.createUser(UNKNOWN_USER, createUserDTO),
+    ).rejects.toThrow('Username user01 already exists.');
   });
 
   it('check password', async () => {
@@ -58,14 +60,14 @@ describe('UserService', () => {
       name: 'User Three',
       rawPassword: 'password01',
     };
-    const user = await service.createUser(createUserDTO);
-    const validPassword = await service.checkPassword({
+    await service.createUser(UNKNOWN_USER, createUserDTO);
+    const validPassword = await service.checkPassword(UNKNOWN_USER, {
       username: createUserDTO.username,
       password: createUserDTO.rawPassword,
     });
     expect(validPassword).toEqual(true);
 
-    const invalidPassword = await service.checkPassword({
+    const invalidPassword = await service.checkPassword(UNKNOWN_USER, {
       username: createUserDTO.username,
       password: 'badpassword',
     });

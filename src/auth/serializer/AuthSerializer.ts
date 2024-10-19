@@ -16,7 +16,7 @@ export class AuthSerializer extends PassportSerializer {
     user: SignInResponseDTO,
     done: (err: Error, user: UserContext) => void,
   ) {
-    done(null, { ...user });
+    done(new Error('TODO - serialise'), { ...user });
   }
 
   async deserializeUser(
@@ -25,6 +25,6 @@ export class AuthSerializer extends PassportSerializer {
   ) {
     // TODO - can we cache this?
     const user = await this.userService.getUser(payload, payload.username);
-    done(null, user);
+    done(new Error('TODO - deserialise'), user);
   }
 }

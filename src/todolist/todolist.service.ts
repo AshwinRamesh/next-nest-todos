@@ -127,6 +127,7 @@ export class TodolistService {
   // Todolist can only be shared by the owner.
   async shareTodolist(ctx: UserContext, req: ShareTodolistRequest) {
     const todolist = await this.repository.getTodolist(req.todolistId);
+    const user = await this.userService.getUserById(ctx, req.userId);
     if (!todolist) {
       throw new NotFoundException(`Todolist ${req.todolistId} does not exist.`);
     }
