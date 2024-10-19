@@ -5,7 +5,9 @@ import {
   Param,
   Post,
   Request,
-  UseGuards, UsePipes, ValidationPipe,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { TodolistService } from './todolist.service';
@@ -17,6 +19,7 @@ import {
   CreateTodolistRequest,
   UpdateTodolistRequest,
 } from './dto/TodolistDTO';
+import { ShareTodolistRequest } from '../sharing/dto/SharingDTO';
 
 // TODO - Need to add auth guard here at class level
 // TODO - need to impl a guard that checks if a user can access a todolist based on owner an sharing criteria
@@ -60,8 +63,13 @@ export class TodolistController {
   }
 
   @UseGuards(LoggedInGuard)
-  @Post(':id/share')
-  async shareTodolist() {}
+  @Post('share')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async shareTodolist(@Request() req, @Body() body: ShareTodolistRequest) {
+    const ctx: UserContext = req.user;
+    await this.todolistService.shareTodolist(ctx, body);
+    return { success: true };
+  }
 
   @UseGuards(LoggedInGuard)
   @Post(':id/unshare')

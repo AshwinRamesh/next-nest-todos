@@ -18,6 +18,7 @@ import { SharingModule } from './sharing/sharing.module';
     RedisModule,
     ExperimentsModule,
     TodolistModule,
+    SharingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

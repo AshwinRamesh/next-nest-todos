@@ -29,7 +29,7 @@ export class SharingService {
     return {
       isShared: await this.shareRepository.isShared(
         req.todolistId,
-        req.todolistId,
+        req.userId,
       ),
     };
   }

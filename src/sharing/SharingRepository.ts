@@ -3,7 +3,9 @@ import { SharedList } from '../entities/SharedList';
 import { Todolist } from '../entities/Todolist';
 import { User } from '../entities/User';
 import { DbError } from '../common/DbUtils';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class SharingRepository {
   constructor(private readonly em: EntityManager) {}
 

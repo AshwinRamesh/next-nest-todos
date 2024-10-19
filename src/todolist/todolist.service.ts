@@ -144,7 +144,7 @@ export class TodolistService {
     if (!todolist) {
       throw new NotFoundException(`Todolist ${req.todolistId} does not exist.`);
     }
-    if (todolist.creator.id === ctx.id) {
+    if (todolist.creator.id != ctx.id) {
       throw new UnauthorizedException(`Only owner of todolist can share it.`);
     }
     return await this.shareService.share(ctx, req);
