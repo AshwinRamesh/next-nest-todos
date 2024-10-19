@@ -9,7 +9,7 @@
 - Update todolist (& item) including marking as completed.
 - Share a todolist with another user - enables Read/Add/Update operations on it.
 
-## Languages & Libraries
+## Infrastructure, Languages & Libraries
 - Javascript + Typescript
 - NestJS: Backend APIs
   - Postgres: Data store
@@ -17,6 +17,7 @@
   - Redis: Session store + caching
 - NextJS: Frontend
   - TailwindCSS
+- Docker: run local Redis/PG
 
 ## Structure of NestJS Modules
 
