@@ -49,6 +49,7 @@ export class TodolistRepository {
       todolist.isCompleted = isCompleted;
     }
     await this.em.persist(todolist).flush();
+    await this.em.refresh(todolist);
     return todolist;
   }
 

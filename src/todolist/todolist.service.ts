@@ -16,10 +16,13 @@ import {
 import {
   CreateTodolistItemRequest,
   CreateTodolistRequest,
+  ItemDTO,
+  TodolistDTO,
   UpdateTodolistItemRequest,
   UpdateTodolistRequest,
 } from './dto/TodolistDTO';
 import { Todolist } from '../entities/Todolist';
+import { TodolistItem } from '../entities/TodoItem';
 
 @Injectable()
 export class TodolistService {
@@ -35,7 +38,7 @@ export class TodolistService {
   ): Promise<boolean> {
     let tl: Todolist;
     if (typeof todolist === 'number') {
-      tl = await this.getTodolist(ctx, todolist);
+      tl = await this._getTodolist(ctx, todolist);
     } else {
       tl = todolist;
     }
@@ -59,20 +62,27 @@ export class TodolistService {
       req.userId,
       req.details,
     );
-    return todolist;
+    return TodolistService.mapTodolistFromEntity(todolist);
   }
 
   async updateTodolist(ctx: UserContext, req: UpdateTodolistRequest) {
     await this.getTodolistAndCheckAccess(ctx, req.id); // Checks for access
-    return await this.repository.updateTodolist(
-      req.id,
-      req.name,
-      req.details,
-      req.isCompleted,
+    return TodolistService.mapTodolistFromEntity(
+      await this.repository.updateTodolist(
+        req.id,
+        req.name,
+        req.details,
+        req.isCompleted,
+      ),
     );
   }
 
   async getTodolist(ctx: UserContext, id: number) {
+    const todolist = await this._getTodolist(ctx, id);
+    return TodolistService.mapTodolistFromEntity(todolist);
+  }
+
+  private async _getTodolist(ctx: UserContext, id: number) {
     const todolist = await this.repository.getTodolist(id);
     if (!todolist) {
       throw new NotFoundException(`Todolist ${id} does not exist`);
@@ -82,7 +92,7 @@ export class TodolistService {
 
   // Returns todolist if user has access. Otherwise throws error.
   async getTodolistAndCheckAccess(ctx: UserContext, id: number) {
-    const todolist = await this.getTodolist(ctx, id);
+    const todolist = await this._getTodolist(ctx, id);
     const hasAccess = await this.checkTodolistAccess(ctx, todolist);
     if (!hasAccess) {
       throw new ForbiddenException(
@@ -127,7 +137,10 @@ export class TodolistService {
   // Todolist can only be shared by the owner.
   async shareTodolist(ctx: UserContext, req: ShareTodolistRequest) {
     const todolist = await this.repository.getTodolist(req.todolistId);
-    const user = await this.userService.getUserById(ctx, req.userId);
+
+    // This will throw error if user does not exist.
+    await this.userService.getUserById(ctx, req.userId);
+
     if (!todolist) {
       throw new NotFoundException(`Todolist ${req.todolistId} does not exist.`);
     }
@@ -135,5 +148,36 @@ export class TodolistService {
       throw new UnauthorizedException(`Only owner of todolist can share it.`);
     }
     return await this.shareService.share(ctx, req);
+  }
+
+  private static mapTodolistFromEntity(
+    todolist: Todolist,
+    items?: TodolistItem[],
+  ): TodolistDTO {
+    let itemsList: ItemDTO[] | null = null;
+    if (items) {
+      itemsList = items.map((item) => TodolistService.mapItemFromEntity(item));
+    }
+    const dto = new TodolistDTO(
+      todolist.id,
+      todolist.creator.id,
+      todolist.name,
+      todolist.details,
+      todolist.isCompleted,
+      itemsList,
+    );
+
+    return dto;
+  }
+
+  private static mapItemFromEntity(item: TodolistItem): ItemDTO {
+    return new ItemDTO(
+      item.id,
+      item.name,
+      item.creator.id,
+      item.details,
+      item.isCompleted,
+      item.todolist.id,
+    );
   }
 }
