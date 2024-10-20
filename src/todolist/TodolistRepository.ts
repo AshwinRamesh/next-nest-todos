@@ -72,7 +72,7 @@ export class TodolistRepository {
     if (!tl) {
       throw new DbError(`No Todolist with id ${todoListId}`);
     }
-    const item = new TodolistItem(name, this.em.getReference(User, userId));
+    const item = new TodolistItem(name, this.em.getReference(User, userId), tl);
     await this.em.persist(item).flush();
     return item;
   }
@@ -98,5 +98,21 @@ export class TodolistRepository {
     }
     await this.em.persist(item).flush();
     return item;
+  }
+
+  async getAllTodolistsForUser(userId: number) {
+    return await this.em.findAll(Todolist, {
+      where: {
+        creator: this.em.getReference(User, userId),
+      },
+    });
+  }
+
+  async getTodolistsByIds(todolistIds: number[]) {
+    return await this.em.findAll(Todolist, {
+      where: {
+        id: { $in: todolistIds },
+      },
+    });
   }
 }

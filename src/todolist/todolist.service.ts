@@ -11,6 +11,7 @@ import { UserService } from '../user/user.service';
 import { UNKNOWN_USER, UserContext } from '../auth/dto/UserContext';
 import {
   CheckIfSharedRequest,
+  GetAllSharedTodolistsRequest,
   ShareTodolistRequest,
 } from '../sharing/dto/SharingDTO';
 import {
@@ -110,7 +111,7 @@ export class TodolistService {
       req.name,
       req.userId,
     );
-    return item; // TODO - change to DTO later
+    return TodolistService.mapItemFromEntity(item);
   }
 
   async updateItem(ctx: UserContext, req: UpdateTodolistItemRequest) {
@@ -131,7 +132,7 @@ export class TodolistService {
       throw new NotFoundException(`Todolist Item ${id} does not exist`);
     }
     await this.getTodolistAndCheckAccess(ctx, item.todolist.id); // TODO - can we just get the id?
-    return item;
+    return TodolistService.mapItemFromEntity(item);
   }
 
   // Todolist can only be shared by the owner.
@@ -148,6 +149,33 @@ export class TodolistService {
       throw new UnauthorizedException(`Only owner of todolist can share it.`);
     }
     return await this.shareService.share(ctx, req);
+  }
+
+  async unshareTodolist(ctx: UserContext, req: ShareTodolistRequest) {
+    const todolist = await this.repository.getTodolist(req.todolistId);
+
+    // This will throw error if user does not exist.
+    await this.userService.getUserById(ctx, req.userId);
+
+    if (!todolist) {
+      throw new NotFoundException(`Todolist ${req.todolistId} does not exist.`);
+    }
+    if (todolist.creator.id != ctx.id) {
+      throw new UnauthorizedException(`Only owner of todolist can unshare it.`);
+    }
+    return await this.shareService.unshare(ctx, req);
+  }
+
+  async getTodolists(ctx: UserContext) {
+    const todolists = await this.repository.getAllTodolistsForUser(ctx.id);
+    return todolists.map((tl) => TodolistService.mapTodolistFromEntity(tl));
+  }
+
+  async getSharedTodolists(ctx: UserContext) {
+    const req = new GetAllSharedTodolistsRequest(ctx.id);
+    const res = await this.shareService.getAllShared(ctx, req);
+    const todolists = await this.repository.getTodolistsByIds(res.todolistIds);
+    return todolists.map((tl) => TodolistService.mapTodolistFromEntity(tl));
   }
 
   private static mapTodolistFromEntity(

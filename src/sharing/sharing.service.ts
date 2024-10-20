@@ -27,10 +27,7 @@ export class SharingService {
 
   async checkIfShared(ctx: UserContext, req: CheckIfSharedRequest) {
     return {
-      isShared: await this.shareRepository.isShared(
-        req.todolistId,
-        req.userId,
-      ),
+      isShared: await this.shareRepository.isShared(req.todolistId, req.userId),
     };
   }
 
@@ -40,9 +37,7 @@ export class SharingService {
   ): Promise<GetAllSharedTodolistsResponse> {
     const sharedLists = await this.shareRepository.getAllShared(req.userId);
     // TODO - why no work.
-    return new GetAllSharedTodolistsResponse(
-      [],
-      //sharedLists.map((l) => l.todolist.id),
-    );
+    console.log(sharedLists);
+    return new GetAllSharedTodolistsResponse(sharedLists);
   }
 }

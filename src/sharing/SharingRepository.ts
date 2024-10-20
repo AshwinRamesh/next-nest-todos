@@ -50,7 +50,7 @@ export class SharingRepository {
         shared_to: { $eq: this.em.getReference(User, userId) },
       },
     });
-    return sharedLists;
+    return sharedLists.map((sl) => sl.todolist.id);
   }
 
   private async maybeGetShared(

@@ -8,7 +8,7 @@ export class TodolistItem extends BaseEntity {
   @Property()
   name!: string;
 
-  @Property()
+  @Property({ default: null, nullable: true })
   details?: string;
 
   @Property({ default: false }) // TODO - default?
@@ -20,9 +20,10 @@ export class TodolistItem extends BaseEntity {
   @ManyToOne({ entity: () => User })
   creator!: User;
 
-  constructor(name: string, creator: User) {
+  constructor(name: string, creator: User, todolist: Todolist) {
     super();
     this.name = name;
     this.creator = creator;
+    this.todolist = todolist;
   }
 }

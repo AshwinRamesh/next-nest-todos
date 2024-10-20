@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotImplementedException,
   Param,
   Post,
   Request,
@@ -9,14 +10,13 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { TodolistService } from './todolist.service';
-import { SharingService } from '../sharing/sharing.service';
 import { LoggedInGuard } from '../auth/guard/LoggedInGuard';
-import { UpdateUserRequest } from '../user/dto/UpdateUserRequest';
 import { UserContext } from '../auth/dto/UserContext';
 import {
+  CreateTodolistItemRequest,
   CreateTodolistRequest,
+  ItemDTO,
   UpdateTodolistRequest,
 } from './dto/TodolistDTO';
 import { ShareTodolistRequest } from '../sharing/dto/SharingDTO';
@@ -25,17 +25,20 @@ import { ShareTodolistRequest } from '../sharing/dto/SharingDTO';
 // TODO - need to impl a guard that checks if a user can access a todolist based on owner an sharing criteria
 @Controller('todolist')
 export class TodolistController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly todolistService: TodolistService,
-    private readonly shareService: SharingService,
-  ) {}
-  // (@Request() req, @Body() data: UpdateUserRequest) {
-  //     const ctx: UserContext = req.user;
+  constructor(private readonly todolistService: TodolistService) {}
+
   @UseGuards(LoggedInGuard)
   @Get('all')
-  async getAllTodolists() {
-    // TODO - still need to impl service/repo
+  async getAllTodolists(@Request() req) {
+    const ctx: UserContext = req.user;
+    const [myLists, sharedLists] = await Promise.all([
+      this.todolistService.getTodolists(ctx),
+      this.todolistService.getSharedTodolists(ctx),
+    ]);
+    return {
+      myTodolists: myLists,
+      sharedTodolists: sharedLists,
+    };
   }
 
   @UseGuards(LoggedInGuard)
@@ -72,14 +75,47 @@ export class TodolistController {
   }
 
   @UseGuards(LoggedInGuard)
-  @Post(':id/unshare')
-  async unshareTodolist() {}
+  @Post('unshare')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async unshareTodolist(@Request() req, @Body() body: ShareTodolistRequest) {
+    const ctx: UserContext = req.user;
+    await this.todolistService.unshareTodolist(ctx, body);
+    return { success: true };
+  }
 
   @UseGuards(LoggedInGuard)
-  @Get(':id/item/:itemId')
-  async getTodolistItem() {}
+  @Get('item/:itemId')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getTodolistItem(
+    @Request() req,
+    @Param('itemId') itemId: number,
+  ): Promise<ItemDTO> {
+    const ctx: UserContext = req.user;
+    return await this.todolistService.getItem(ctx, itemId);
+  }
 
   @UseGuards(LoggedInGuard)
-  @Post(':id/item/:itemId')
-  async updateTodolistItem() {}
+  @Post('item/create')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async createTodolistItem(
+    @Request() req,
+    @Body() body: CreateTodolistItemRequest,
+  ): Promise<ItemDTO> {
+    const ctx: UserContext = req.user;
+    return this.todolistService.createItem(ctx, body);
+  }
+
+  @UseGuards(LoggedInGuard)
+  @Post('item/update')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async updateTodolistItem() {
+    throw new NotImplementedException('TODO'); // TODO
+  }
+
+  @UseGuards(LoggedInGuard)
+  @Get(':id/items')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getAllItems() {
+    throw new NotImplementedException('TODO'); // TODO
+  }
 }
