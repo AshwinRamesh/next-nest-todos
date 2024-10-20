@@ -115,4 +115,12 @@ export class TodolistRepository {
       },
     });
   }
+
+  async getTodolistItems(todolistId: number) {
+    return await this.em.findAll(TodolistItem, {
+      where: {
+        todolist: this.em.getReference(Todolist, todolistId),
+      },
+    });
+  }
 }

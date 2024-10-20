@@ -17,6 +17,7 @@ import {
   CreateTodolistItemRequest,
   CreateTodolistRequest,
   ItemDTO,
+  UpdateTodolistItemRequest,
   UpdateTodolistRequest,
 } from './dto/TodolistDTO';
 import { ShareTodolistRequest } from '../sharing/dto/SharingDTO';
@@ -108,14 +109,19 @@ export class TodolistController {
   @UseGuards(LoggedInGuard)
   @Post('item/update')
   @UsePipes(new ValidationPipe({ transform: true }))
-  async updateTodolistItem() {
-    throw new NotImplementedException('TODO'); // TODO
+  async updateTodolistItem(
+    @Request() req,
+    @Body() body: UpdateTodolistItemRequest,
+  ) {
+    const ctx: UserContext = req.user;
+    return this.todolistService.updateItem(ctx, body);
   }
 
   @UseGuards(LoggedInGuard)
   @Get(':id/items')
   @UsePipes(new ValidationPipe({ transform: true }))
-  async getAllItems() {
-    throw new NotImplementedException('TODO'); // TODO
+  async getAllItems(@Request() req, @Param('id') id: number) {
+    const ctx: UserContext = req.user;
+    return this.todolistService.getTodolistItems(ctx, id);
   }
 }

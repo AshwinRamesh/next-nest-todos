@@ -123,7 +123,7 @@ export class TodolistService {
       req.details,
       req.isCompleted,
     );
-    return updatedItem;
+    return mapItemFromEntity(updatedItem);
   }
 
   // Returns item if user has access. Otherwise throws error.
@@ -177,5 +177,11 @@ export class TodolistService {
     const res = await this.shareService.getAllShared(ctx, req);
     const todolists = await this.repository.getTodolistsByIds(res.todolistIds);
     return todolists.map((tl) => mapTodolistFromEntity(tl));
+  }
+
+  async getTodolistItems(ctx: UserContext, todolistId: number) {
+    await this.getTodolist(ctx, todolistId); // Will raise if no access
+    const items = await this.repository.getTodolistItems(todolistId);
+    return items.map((item) => mapItemFromEntity(item));
   }
 }
