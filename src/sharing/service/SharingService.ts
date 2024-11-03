@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { UserContext } from '../auth/dto/UserContext';
+import { UserContext } from '../../auth/dto/UserContext';
 import {
   CheckIfSharedRequest,
   GetAllSharedTodolistsRequest,
   GetAllSharedTodolistsResponse,
   ShareTodolistRequest,
-} from './dto/SharingDTO';
-import { SharingRepository } from './SharingRepository';
+} from '../dto/SharingDTO';
+import { SharingRepository } from '../SharingRepository';
+import { SharingServiceInterface } from './SharingServiceInterface';
 
 /**
  * Responsible for mapping what entities are shared with other users.
@@ -14,7 +15,7 @@ import { SharingRepository } from './SharingRepository';
  * This service should only be called from another service that has sharable objects -e.g. Todolist.
  */
 @Injectable()
-export class SharingService {
+export class SharingService implements SharingServiceInterface{
   constructor(private readonly shareRepository: SharingRepository) {}
 
   async share(ctx: UserContext, req: ShareTodolistRequest) {
