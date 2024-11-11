@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { UserContext } from './dto/UserContext';
 import { CreateUserDTO } from '../user/dto/CreateUserRequest';
+import { UserDTO } from '../user/dto/UserDTO';
 
 export class SignInDTO {
   username: string;
@@ -16,8 +17,28 @@ export class SignInResponseDTO {
   access_token?: string;
 }
 
+export interface AuthServiceInterface {
+  validateUser(ctx: UserContext, data: SignInDTO): Promise<SignInResponseDTO>;
+  registerUser(ctx: UserContext, data: CreateUserDTO): Promise<UserDTO>;
+}
+
+export class AuthServiceLocalClient implements AuthServiceInterface {
+  constructor(readonly service: AuthService) {}
+
+  async validateUser(
+    ctx: UserContext,
+    data: SignInDTO,
+  ): Promise<SignInResponseDTO> {
+    return this.service.validateUser(ctx, data);
+  }
+
+  async registerUser(ctx: UserContext, data: CreateUserDTO): Promise<UserDTO> {
+    return this.service.registerUser(ctx, data);
+  }
+}
+
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthServiceInterface {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,

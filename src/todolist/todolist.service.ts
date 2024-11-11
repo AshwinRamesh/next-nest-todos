@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { TodolistRepository } from './TodolistRepository';
-import { SharingService } from '../sharing/sharing.service';
 import { UserService } from '../user/user.service';
 import { UNKNOWN_USER, UserContext } from '../auth/dto/UserContext';
 import {
@@ -17,21 +16,19 @@ import {
 import {
   CreateTodolistItemRequest,
   CreateTodolistRequest,
-  ItemDTO,
-  TodolistDTO,
   UpdateTodolistItemRequest,
   UpdateTodolistRequest,
 } from './dto/TodolistDTO';
 import { Todolist } from '../entities/Todolist';
-import { TodolistItem } from '../entities/TodoItem';
 import { mapItemFromEntity, mapTodolistFromEntity } from './utils';
+import { SharingServiceLocalClient } from '../sharing/service/SharingServiceClient';
 
 @Injectable()
 export class TodolistService {
   constructor(
     private readonly repository: TodolistRepository,
     private readonly userService: UserService,
-    private readonly shareService: SharingService,
+    private readonly shareService: SharingServiceLocalClient,
   ) {}
 
   private async checkTodolistAccess(

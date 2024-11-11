@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SharingService } from '../sharing.service';
+import { SharingService } from '../service/SharingService';
 
 describe('SharingService', () => {
   let service: SharingService;
